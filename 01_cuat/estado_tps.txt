@@ -1,0 +1,39 @@
+***********************************************************************************************************************************
+*                                    Planilla de avance de Trabajos Prácticos del Alumno                                          *
+*                                                                                                                                 *
+* Instrucciones: Colocar en el directorio raíz del repositorio local, para que sea de fácil acceso. Completar los datos (Usuario  * * SGE, Legajo)
+* Indicar el estado del ejercicio: Funciona: SI / NO                                                                              *
+* Agregar comentarios en caso que consideren oportuno, (por ejemplo si se compila con un makefile).                                *
+***********************************************************************************************************************************
+->Usuario SGE: ahojnadel
+->Legajo: 1545632
+********************************************
+*		    TP 1		   *
+********************************************
+TP01.01: Funciona ->        	Comentarios:
+TP01.02: Funciona ->        	Comentarios:
+TP01.03: Funciona ->        	Comentarios:
+TP01.04: Funciona ->        	Comentarios:
+
+TP01.05: Funciona -> 	SI      Comentarios: Copia desde las rutinas desde rom a ram y después copia las rutinas desde ram 															 a ram en la seccion nucleo como prueba
+TP01.06: Funciona ->    SI 		Comentarios:
+TP01.07: Funciona ->	SI      Comentarios: No genera la excepción por doble falta, pero genera excepción de overflow con 'o'
+TP01.08: Funciona ->    SI	    Comentarios: En se generó la interrupción del PIT cada 10ms pero en bochs muestra 180 int por segundo
+TP01.09: Funciona ->    SI    	Comentarios: 
+TP01.10: Funciona ->    SI 		Comentarios: La excepción de paginación se genera presionando P; se hace un jump a memoria no paginada.
+											 Se carga el número de excepción en EDX y la dirección lineal que produjo la excepcion en EBX
+TP01.11: Funciona ->    SI 	 	Comentarios: Se cambió la dirección de ubicación de "Tabla de Digitos" a la que estaba en el enunciado del 
+											 ejercicio 6 ya que si no se pisaba con la dirección lineal de la "Pila de Tarea 1"
+TP01.12: Funciona ->    SI	 	Comentarios: Anda
+TP01.13: Funciona ->    SI    	Comentarios:
+TP01.14: Funciona ->        	Comentarios:
+TP01.15: Funciona ->    SI    	Comentarios: Anda. Chau Chau TP!
+
+********************************************
+*              TP Integrador               *
+********************************************
+Filtros.C:   Funciona -> SI/NO       Comentarios:
+Filtros.ASM: Funciona -> SI/NO       Comentarios:
+Servidor:    Funciona -> SI/NO       Comentarios:
+Cliente:     Funciona -> SI/NO       Comentarios:
+OPENCV:      Funciona -> SI/NO       Comentarios:

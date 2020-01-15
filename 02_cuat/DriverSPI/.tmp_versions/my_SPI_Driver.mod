@@ -1,0 +1,3 @@
+/home/andres/repolocal/r5054-Hojnadel-Andres/02_cuat/DriverSPI/src/my_SPI_Driver.ko
+/home/andres/repolocal/r5054-Hojnadel-Andres/02_cuat/DriverSPI/src/my_SPI_Driver.o
+

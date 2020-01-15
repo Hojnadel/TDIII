@@ -1,0 +1,163 @@
+
+Configuración de la Memoria
+
+Nombre           Origen             Longitud           Atributos
+ram              0x0000000000000000 0x00000000ffff0000 xrw
+rom              0x00000000ffff0000 0x000000000000fff0 xr
+rom_reset        0x00000000fffffff0 0x0000000000000010 xr
+*default*        0x0000000000000000 0xffffffffffffffff
+
+Guión del enlazador y mapa de memoria
+
+                0x000000001fffb000                __STACK_START = 0x1fffb000
+                0x0000000000004000                __STACK_SIZE = 0x4000
+                0x000000001ffff000                __STACK_END = (__STACK_START + __STACK_SIZE)
+                0x0000000000310000                __DIGIT_TABLE_START = 0x310000
+                0x000000000000ffff                __DIGIT_TABLE_SIZE = 0xffff
+                0x000000000031ffff                __DIGIT_TABLE_END = (__DIGIT_TABLE_START + __DIGIT_TABLE_SIZE)
+                0x00000000000b8000                __VIDEO_BUFFER_START = 0xb8000
+                0x0000000000007fff                __VIDEO_BUFFER_LEN = 0x7fff
+                0x00000000000bffff                __VIDEO_BUFFER_END = (__VIDEO_BUFFER_START + __VIDEO_BUFFER_LEN)
+                0x00000000ffff0000                . = 0xffff0000
+
+.init           0x00000000ffff0000     0x14ac
+ *(.init)
+ .init          0x00000000ffff0000        0xf bin/pit.elf
+                0x00000000ffff0000                __pit_configure
+ .init          0x00000000ffff000f      0x138 bin/bios.elf
+ .init          0x00000000ffff0147     0x1339 bin/__driver_screen.elf
+                0x00000000ffff1246                __bios_init
+ .init          0x00000000ffff1480       0x2c bin/pic.elf
+                0x00000000ffff1480                __pic_configure
+                0x00000000ffff14a5                pic_enable_interrupt
+
+.isr            0x0000000000000000       0xc9 dirección de carga 0x00000000ffff14ac
+                0x0000000000000000                __ISR_START_RAM = .
+                0x00000000ffff14ac                __ISR_START_ROM = LOADADDR (.isr)
+ *(.isr)
+ .isr           0x0000000000000000       0xc9 bin/isr_handlers.elf
+                0x0000000000000000                EX0_DE_HANDLER
+                0x0000000000000005                EX1_DB_HANDLER
+                0x000000000000000a                EX2_NMI_HANDLER
+                0x000000000000000f                EX3_BP_HANDLER
+                0x0000000000000014                EX4_OF_HANDLER
+                0x0000000000000019                EX5_BR_HANDLER
+                0x000000000000001e                EX6_UD_HANDLER
+                0x0000000000000023                EX7_NM_HANDLER
+                0x0000000000000028                EX8_DF_HANDLER
+                0x000000000000002d                EX9_CSO_HANDLER
+                0x0000000000000032                EX10_TS_HANDLER
+                0x0000000000000037                EX11_NP_HANDLER
+                0x000000000000003c                EX12_SS_HANDLER
+                0x0000000000000041                EX13_GP_HANDLER
+                0x0000000000000046                EX14_PF_HANDLER
+                0x000000000000004b                EX16_MF_HANDLER
+                0x0000000000000050                EX17_AC_HANDLER
+                0x0000000000000055                EX18_MC_HANDLER
+                0x000000000000005a                EX19_XM_HANDLER
+                0x000000000000005f                EX20_VE_HANDLER
+                0x0000000000000064                ISR0_0x20_HANDLER
+                0x0000000000000075                ISR1_0x21_HANDLER
+                0x0000000000000083                ISR2_0x22_HANDLER
+                0x0000000000000088                ISR3_0x23_HANDLER
+                0x000000000000008d                ISR4_0x24_HANDLER
+                0x0000000000000092                ISR5_0x25_HANDLER
+                0x0000000000000097                ISR6_0x26_HANDLER
+                0x000000000000009c                ISR7_0x27_HANDLER
+                0x00000000000000a1                ISR8_0x28_HANDLER
+                0x00000000000000a6                ISR9_0x29_HANDLER
+                0x00000000000000ab                ISR10_0x2A_HANDLER
+                0x00000000000000b0                ISR11_0x2B_HANDLER
+                0x00000000000000b5                ISR12_0x2C_HANDLER
+                0x00000000000000ba                ISR13_0x2D_HANDLER
+                0x00000000000000bf                ISR14_0x2E_HANDLER
+                0x00000000000000c4                ISR15_0x2F_HANDLER
+
+.sys_tables     0x0000000000100000      0x1a4 dirección de carga 0x00000000ffff1575
+                0x0000000000100000                __SYS_TABLES_RAM = .
+                0x00000000ffff1575                __SYS_TABLES_ROM = LOADADDR (.sys_tables)
+ *(.sys_tables)
+ .sys_tables    0x0000000000100000      0x1a4 bin/sys_tables.elf
+                0x0000000000100000                gdt_ram
+                0x0000000000100018                img_gdtr_ram
+                0x000000000010019e                img_idtr
+
+.copy           0x0000000000200000       0x15 dirección de carga 0x00000000ffff1719
+                0x0000000000200000                __COPY_IN_RAM = .
+                0x00000000ffff1719                __COPY_IN_ROM = LOADADDR (.copy)
+ *(.copy)
+ .copy          0x0000000000200000       0x15 bin/rutinas.elf
+
+.rutinas        0x0000000000210000      0x34a dirección de carga 0x00000000ffff172e
+                0x0000000000210000                __ROUTINES_START_RAM = .
+                0x00000000ffff172e                __ROUTINES_START_ROM = LOADADDR (.rutinas)
+                0x0000000000210000                __KEYBOARD_ROUTINE = .
+ *(.rutinas_keyboard)
+ .rutinas_keyboard
+                0x0000000000210000      0x280 bin/rutinas.elf
+                0x0000000000210000                check_0x60_kb
+ .rutinas       0x0000000000210280       0xca bin/print_screen.elf
+                0x0000000000210298                print_screen
+
+.kernel         0x0000000000300000       0x35 dirección de carga 0x00000000ffff1a78
+                0x0000000000300000                __KERNEL_START_RAM = .
+                0x00000000ffff1a78                __KERNEL_START_ROM = LOADADDR (.kernel)
+ *(.nucleo)
+ .kernel        0x0000000000300000       0x35 bin/kernel.elf
+                0x0000000000300000                infinit_loop
+
+.digit_table
+
+.task1          0x0000000000320000       0x3f dirección de carga 0x00000000ffff1aad
+                0x0000000000320000                __TASK1_START_RAM = .
+                0x00000000ffff1aad                __TASK1_START_ROM = LOADADDR (.task1)
+ *(.task1)
+ .task1         0x0000000000320000       0x3f bin/task1.elf
+                0x0000000000320000                task1
+
+.datos          0x00000000003e0000        0x2 dirección de carga 0x00000000ffff1aec
+                0x00000000003e0000                __DATOS_START_RAM = .
+                0x00000000ffff1aec                __DATOS_START_ROM = LOADADDR (.datos)
+ *(.datos)
+ .datos         0x00000000003e0000        0x2 bin/task1.elf
+                0x00000000003e0000                timer_counter_task1
+
+.bss            0x00000000003f0000       0x41 dirección de carga 0x00000000ffff1aee
+                0x00000000003f0000                __BSS_START = .
+ *(.bss)
+ .bss           0x00000000003f0000       0x36 bin/rutinas.elf
+                0x00000000003f0000                isr_kb_flag
+                0x00000000003f0001                digit_table_index
+                0x00000000003f0003                keyboard_buffer
+                0x00000000003f0023                keyboard_buffer_index
+                0x00000000003f0024                kb_analysis_buffer
+                0x00000000003f0034                kb_analysis_buffer_index
+                0x00000000003f0035                kb_analysis_buffer_qty
+ *fill*         0x00000000003f0036        0x2 
+ .bss           0x00000000003f0038        0x9 bin/task1.elf
+                0x00000000003f0038                acum_sum
+                0x00000000003f0040                new_number_flag
+                0x00000000fffffff0                . = 0xfffffff0
+
+.reset          0x00000000fffffff0       0x10
+ *(.reset)
+ .reset         0x00000000fffffff0       0x10 bin/bios.elf
+                0x00000000000000c9                __ISR_LEN = SIZEOF (.isr)
+                0x0000000000000035                __KERNEL_LEN = SIZEOF (.kernel)
+                0x000000000000034a                __ROUTINES_LEN = SIZEOF (.rutinas)
+                0x0000000000000015                __COPY_LEN = SIZEOF (.copy)
+                0x00000000000001a4                __SYS_TABLES_LEN = SIZEOF (.sys_tables)
+                0x000000000000003f                __TASK1_LEN = SIZEOF (.task1)
+                0x0000000000000002                __DATOS_LEN = SIZEOF (.datos)
+                0x0000000000000041                __BSS_LEN = SIZEOF (.bss)
+LOAD bin/print_screen.elf
+LOAD bin/pit.elf
+LOAD bin/bios.elf
+LOAD bin/__driver_screen.elf
+LOAD bin/rutinas.elf
+LOAD bin/isr_handlers.elf
+LOAD bin/sys_tables.elf
+LOAD bin/pic.elf
+LOAD bin/task1.elf
+LOAD bin/kernel.elf
+OUTPUT(bin/bios.bin binary)

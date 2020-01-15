@@ -1,0 +1,238 @@
+
+Configuración de la Memoria
+
+Nombre           Origen             Longitud           Atributos
+ram              0x0000000000000000 0x00000000ffff0000 xrw
+rom              0x00000000ffff0000 0x000000000000fff0 xr
+rom_reset        0x00000000fffffff0 0x0000000000000010 xr
+*default*        0x0000000000000000 0xffffffffffffffff
+
+Guión del enlazador y mapa de memoria
+
+                0x00000000000b8000                __VIDEO_BUFFER_LINEAR_ADDR = 0xb8000
+                0x00000000000b8000                __VIDEO_BUFFER_START = __VIDEO_BUFFER_LINEAR_ADDR
+                0x0000000000007fff                __VIDEO_BUFFER_LEN = 0x7fff
+                0x00000000000bffff                __VIDEO_BUFFER_END = (__VIDEO_BUFFER_START + __VIDEO_BUFFER_LEN)
+                0x0000000000110000                __PAGE_TABLES_LINEAR_ADDR = 0x110000
+                0x0000000000110000                __PAGE_DIRECTORY_ADDR = __PAGE_TABLES_LINEAR_ADDR
+                0x0000000000111000                __PAGE_TABLE_0x000_ADDR = (__PAGE_DIRECTORY_ADDR + 0x1000)
+                0x0000000000112000                __PAGE_TABLE_0x001_ADDR = (__PAGE_DIRECTORY_ADDR + 0x2000)
+                0x0000000000113000                __PAGE_TABLE_0x07F_ADDR = (__PAGE_DIRECTORY_ADDR + 0x3000)
+                0x0000000000114000                __PAGE_TABLE_0x3FF_ADDR = (__PAGE_DIRECTORY_ADDR + 0x4000)
+                0x0000000000000004                __PAGE_TABLES_QTY = 0x4
+                0x0000000000005000                __PAGE_TABLES_SIZE = ((__PAGE_TABLES_QTY + 0x1) * 0x1000)
+                0x0000000000410000                __DIGIT_TABLE_LINEAR_ADDR = 0x410000
+                0x0000000000410000                __DIGIT_TABLE_START = __DIGIT_TABLE_LINEAR_ADDR
+                0x000000000000ffff                __DIGIT_TABLE_SIZE = 0xffff
+                0x000000000041ffff                __DIGIT_TABLE_END = (__DIGIT_TABLE_START + __DIGIT_TABLE_SIZE)
+                0x000000001fffb000                __STACK_LINEAR_ADDR = 0x1fffb000
+                0x000000001fffb000                __STACK_START = __STACK_LINEAR_ADDR
+                0x0000000000003000                __STACK_SIZE = 0x3000
+                0x000000001fffe000                __STACK_END = (__STACK_START + __STACK_SIZE)
+                0x000000001fffe000                __TASK1_STACK_LINEAR_ADDR = 0x1fffe000
+                0x000000001fffe000                __TASK1_STACK_START = __TASK1_STACK_LINEAR_ADDR
+                0x0000000000002000                __TASK1_STACK_SIZE = 0x2000
+                0x0000000020000000                __TASK1_STACK_END = (__TASK1_STACK_START + __TASK1_STACK_SIZE)
+                0x0000000000000000                __ISR_PHYSICAL_ADDR = 0x0
+                0x00000000000b8000                __VIDEO_BUFFER_PHYSICAL_ADDR = 0xb8000
+                0x0000000000100000                __SYS_TABLES_PHYSICAL_ADDR = 0x100000
+                0x0000000000110000                __PAGE_TABLES_PHYISICAL_ADDR = 0x110000
+                0x0000000000200000                __COPY_PHYSICAL_ADDR = 0x200000
+                0x0000000000210000                __ROUTINES_PHYSICAL_ADDR = 0x210000
+                0x00000000003f0000                __INIT_RAM_PHYSICAL_ADDR = 0x3f0000
+                0x0000000000400000                __KERNEL_PHYSICAL_ADDR = 0x400000
+                0x0000000000410000                __DIGIT_TABLE_PHYSICAL_ADDR = 0x410000
+                0x0000000000420000                __TASK1_TEXT_PHYSICAL_ADDR = 0x420000
+                0x0000000000421000                __TASK1_BSS_PHYSICAL_ADDR = 0x421000
+                0x0000000000422000                __TASK1_DATA_PHYSICAL_ADDR = 0x422000
+                0x00000000004e0000                __DATA_PHYSICAL_ADDR = 0x4e0000
+                0x00000000004f0000                __BSS_PHYSICAL_ADDR = 0x4f0000
+                0x000000001fffb000                __STACK_PHYSICAL_ADDR = 0x1fffb000
+                0x000000001fffe000                __TASK1_STACK_PHYSICAL_ADDR = 0x1fffe000
+                0x00000000ffff0000                __INIT_PHYSICAL_ADDR = 0xffff0000
+                0x00000000fffffff0                __RESET_PHYSICAL_ADDR = 0xfffffff0
+
+.init           0x00000000ffff0000     0x1445
+                0x00000000ffff0000                __INIT_LINEAR_ADDR = .
+ *(.init)
+ .init          0x00000000ffff0000        0xf bin/pit.elf
+                0x00000000ffff0000                __pit_configure
+ .init          0x00000000ffff000f       0xd1 bin/bios.elf
+ .init          0x00000000ffff00e0     0x1339 bin/__driver_screen.elf
+                0x00000000ffff11df                __bios_init
+ .init          0x00000000ffff1419       0x2c bin/pic.elf
+                0x00000000ffff1419                __pic_configure
+                0x00000000ffff143e                pic_enable_interrupt
+
+.isr            0x0000000000000000      0x110 dirección de carga 0x00000000ffff1445
+                0x0000000000000000                __ISR_LINEAR_ADDR = .
+                0x0000000000000000                __ISR_START_RAM = __ISR_LINEAR_ADDR
+                0x00000000ffff1445                __ISR_START_ROM = LOADADDR (.isr)
+ *(.isr)
+ .isr           0x0000000000000000      0x110 bin/isr_handlers.elf
+                0x0000000000000000                EX0_DE_HANDLER
+                0x0000000000000007                EX1_DB_HANDLER
+                0x000000000000000e                EX2_NMI_HANDLER
+                0x0000000000000015                EX3_BP_HANDLER
+                0x000000000000001c                EX4_OF_HANDLER
+                0x0000000000000023                EX5_BR_HANDLER
+                0x000000000000002a                EX6_UD_HANDLER
+                0x0000000000000031                EX7_NM_HANDLER
+                0x0000000000000038                EX8_DF_HANDLER
+                0x000000000000003f                EX9_CSO_HANDLER
+                0x0000000000000046                EX10_TS_HANDLER
+                0x000000000000004d                EX11_NP_HANDLER
+                0x0000000000000054                EX12_SS_HANDLER
+                0x000000000000005b                EX13_GP_HANDLER
+                0x0000000000000062                EX14_PF_HANDLER
+                0x000000000000006c                EX16_MF_HANDLER
+                0x0000000000000073                EX17_AC_HANDLER
+                0x000000000000007a                EX18_MC_HANDLER
+                0x0000000000000081                EX19_XM_HANDLER
+                0x0000000000000088                EX20_VE_HANDLER
+                0x000000000000008f                ISR0_0x20_HANDLER
+                0x00000000000000a0                ISR1_0x21_HANDLER
+                0x00000000000000ae                ISR2_0x22_HANDLER
+                0x00000000000000b5                ISR3_0x23_HANDLER
+                0x00000000000000bc                ISR4_0x24_HANDLER
+                0x00000000000000c3                ISR5_0x25_HANDLER
+                0x00000000000000ca                ISR6_0x26_HANDLER
+                0x00000000000000d1                ISR7_0x27_HANDLER
+                0x00000000000000d8                ISR8_0x28_HANDLER
+                0x00000000000000df                ISR9_0x29_HANDLER
+                0x00000000000000e6                ISR10_0x2A_HANDLER
+                0x00000000000000ed                ISR11_0x2B_HANDLER
+                0x00000000000000f4                ISR12_0x2C_HANDLER
+                0x00000000000000fb                ISR13_0x2D_HANDLER
+                0x0000000000000102                ISR14_0x2E_HANDLER
+                0x0000000000000109                ISR15_0x2F_HANDLER
+
+.sys_tables     0x0000000000100000      0x1a4 dirección de carga 0x00000000ffff1555
+                0x0000000000100000                __SYS_TABLES_LINEAR_ADDR = .
+                0x0000000000100000                __SYS_TABLES_RAM = __SYS_TABLES_LINEAR_ADDR
+                0x00000000ffff1555                __SYS_TABLES_ROM = LOADADDR (.sys_tables)
+ *(.sys_tables)
+ .sys_tables    0x0000000000100000      0x1a4 bin/sys_tables.elf
+                0x0000000000100000                gdt_ram
+                0x0000000000100018                img_gdtr_ram
+                0x000000000010019e                img_idtr
+
+.copy           0x0000000000200000       0x15 dirección de carga 0x00000000ffff16f9
+                0x0000000000200000                __COPY_LINEAR_ADDR = .
+                0x0000000000200000                __COPY_IN_RAM = __COPY_LINEAR_ADDR
+                0x00000000ffff16f9                __COPY_IN_ROM = LOADADDR (.copy)
+ *(.copy)
+ .copy          0x0000000000200000       0x15 bin/init_ram.elf
+
+.routines       0x0000000000210000      0x386 dirección de carga 0x00000000ffff170e
+                0x0000000000210000                __ROUTINES_LINEAR_ADDR = .
+                0x0000000000210000                __ROUTINES_START_RAM = __ROUTINES_LINEAR_ADDR
+                0x00000000ffff170e                __ROUTINES_START_ROM = LOADADDR (.routines)
+                0x0000000000210000                __KEYBOARD_ROUTINES = .
+ *(.keyboard_routines)
+ .keyboard_routines
+                0x0000000000210000      0x273 bin/rutinas.elf
+                0x0000000000210000                check_0x60_kb
+                0x0000000000210273                __SCREEN_ROUTINES = .
+ *(.screen_routines)
+ .screen_routines
+                0x0000000000210273       0xca bin/print_screen.elf
+                0x000000000021028b                print_screen
+                0x000000000021033d                __PAGINATION_ROUTINES = .
+ *(.pagination_routines)
+ .pagination_routines
+                0x000000000021033d       0x49 bin/paging_system.elf
+                0x000000000021033d                __paginate
+
+.init_RAM       0x00000000003f0000      0x38c dirección de carga 0x00000000ffff1a94
+                0x00000000003f0000                __INIT_RAM_LINEAR_ADDR = .
+                0x00000000003f0000                __INIT_RAM = __INIT_RAM_LINEAR_ADDR
+                0x00000000ffff1a94                __INIT_RAM_LMA = LOADADDR (.init_RAM)
+ *(.init_RAM)
+ .init_RAM      0x00000000003f0000       0xdb bin/init_ram.elf
+                0x00000000003f0000                init_ram_itty_map
+ .init_RAM      0x00000000003f00db      0x2b1 bin/paging_system.elf
+                0x00000000003f00db                page_memory
+
+.kernel         0x0000000000400000       0x35 dirección de carga 0x00000000ffff1e20
+                0x0000000000400000                __KERNEL_LINEAR_ADDR = .
+                0x0000000000400000                __KERNEL_START_RAM = __KERNEL_LINEAR_ADDR
+                0x00000000ffff1e20                __KERNEL_START_ROM = LOADADDR (.kernel)
+ *(.nucleo)
+ .kernel        0x0000000000400000       0x35 bin/kernel.elf
+                0x0000000000400000                infinit_loop
+
+.task1_TEXT     0x0000000000420000       0x3c dirección de carga 0x00000000ffff1e55
+                0x0000000000420000                __TASK1_TEXT_LINEAR_ADDR = .
+                0x0000000000420000                __TASK1_TEXT_START_RAM = __TASK1_TEXT_LINEAR_ADDR
+                0x00000000ffff1e55                __TASK1_TEXT_START_ROM = LOADADDR (.task1_TEXT)
+ *(.task1_TEXT)
+ .task1_TEXT    0x0000000000420000       0x3c bin/task1.elf
+                0x0000000000420000                task1
+
+.task1_BSS      0x0000000000421000        0x9 dirección de carga 0x00000000ffff1e91
+                0x0000000000421000                __TASK1_BSS_LINEAR_ADDR = .
+                0x0000000000421000                __TASK1_BSS_START_RAM = __TASK1_BSS_LINEAR_ADDR
+                0x00000000ffff1e91                __TASK1_BSS_START_ROM = LOADADDR (.task1_BSS)
+ *(.task1_BSS)
+ .task1_BSS     0x0000000000421000        0x9 bin/task1.elf
+                0x0000000000421000                acum_sum
+                0x0000000000421008                new_number_flag
+
+.task1_DATA     0x0000000000422000        0x2 dirección de carga 0x00000000ffff1e91
+                0x0000000000422000                __TASK1_DATA_LINEAR_ADDR = .
+                0x0000000000422000                __TASK1_DATA_START_RAM = __TASK1_DATA_LINEAR_ADDR
+                0x00000000ffff1e91                __TASK1_DATA_START_ROM = LOADADDR (.task1_DATA)
+ *(.task1_DATA)
+ .task1_DATA    0x0000000000422000        0x2 bin/task1.elf
+                0x0000000000422000                timer_counter_task1
+
+.datos          0x00000000004e0000        0x0 dirección de carga 0x00000000ffff1e93
+                0x00000000004e0000                __DATA_LINEAR_ADDR = .
+                0x00000000004e0000                __DATOS_START_RAM = __DATA_LINEAR_ADDR
+                0x00000000ffff1e93                __DATOS_START_ROM = LOADADDR (.datos)
+ *(.datos)
+
+.bss            0x00000000004f0000       0x36 dirección de carga 0x00000000ffff1e93
+                0x00000000004f0000                __BSS_LINEAR_ADDR = .
+                0x00000000004f0000                __BSS_START = __BSS_LINEAR_ADDR
+ *(.bss)
+ .bss           0x00000000004f0000       0x36 bin/rutinas.elf
+                0x00000000004f0000                isr_kb_flag
+                0x00000000004f0001                digit_table_index
+                0x00000000004f0003                keyboard_buffer
+                0x00000000004f0023                keyboard_buffer_index
+                0x00000000004f0024                kb_analysis_buffer
+                0x00000000004f0034                kb_analysis_buffer_index
+                0x00000000004f0035                kb_analysis_buffer_qty
+
+.reset          0x00000000fffffff0       0x10
+                0x00000000fffffff0                __RESET_LINEAR_ADDR = .
+ *(.reset)
+ .reset         0x00000000fffffff0       0x10 bin/bios.elf
+                0x0000000000000110                __ISR_LEN = SIZEOF (.isr)
+                0x00000000000001a4                __SYS_TABLES_LEN = SIZEOF (.sys_tables)
+                0x0000000000000015                __COPY_LEN = SIZEOF (.copy)
+                0x0000000000000386                __ROUTINES_LEN = SIZEOF (.routines)
+                0x000000000000038c                __INIT_RAM_LEN = SIZEOF (.init_RAM)
+                0x0000000000000035                __KERNEL_LEN = SIZEOF (.kernel)
+                0x000000000000003c                __TASK1_TEXT_LEN = SIZEOF (.task1_TEXT)
+                0x0000000000000009                __TASK1_BSS_LEN = SIZEOF (.task1_BSS)
+                0x0000000000000002                __TASK1_DATA_LEN = SIZEOF (.task1_DATA)
+                0x0000000000000000                __DATOS_LEN = SIZEOF (.datos)
+                0x0000000000000036                __BSS_LEN = SIZEOF (.bss)
+                0x0000000000001445                __INIT_LEN = SIZEOF (.init)
+                0x0000000000000010                __RESET_LEN = SIZEOF (.reset)
+LOAD bin/print_screen.elf
+LOAD bin/pit.elf
+LOAD bin/bios.elf
+LOAD bin/__driver_screen.elf
+LOAD bin/rutinas.elf
+LOAD bin/init_ram.elf
+LOAD bin/isr_handlers.elf
+LOAD bin/paging_system.elf
+LOAD bin/sys_tables.elf
+LOAD bin/pic.elf
+LOAD bin/task1.elf
+LOAD bin/kernel.elf
+OUTPUT(bin/bios.bin binary)
